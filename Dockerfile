@@ -1,12 +1,13 @@
-FROM python:2.12
+FROM python:3.11.6
 
 WORKDIR /app
 
 COPY requirements.txt .
-RUN pip install
+RUN pip install -r requirements.txt
 
 COPY . /app
+RUN chmod +x entrypoint.sh
 
-EXPOSE
+EXPOSE 8020
 
-ENTRYPOINT ["entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
