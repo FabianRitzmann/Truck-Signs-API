@@ -12,14 +12,14 @@ done
 
 echo "PostgreSQL is active"
 
-python manage.py collectstatic --noinput
+python ./src/manage.py collectstatic --noinput
 
 echo "Running database migrations..."
-python manage.py migrate --noinput
+python ./src/manage.py migrate --noinput
 
 #TODO add migrations
 echo "Checking for existing superuser..."
-python manage.py shell -c "
+python ./src/manage.py shell -c "
 from django.contrib.auth import get_user_model
 User = get_user_model()
 username = '${DJANGO_SUPERUSER_USERNAME}'
@@ -34,4 +34,4 @@ else:
     print('Superuser already exists, skipping.')
 "
 
-exec gunicorn tsa_app.wsgi:application --bind 0.0.0.0:8000
+exec gunicorn --chdir ./src tsa_app.wsgi:application --bind 0.0.0.0:8000
