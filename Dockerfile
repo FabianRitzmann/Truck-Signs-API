@@ -8,6 +8,6 @@ RUN pip install -r requirements.txt
 COPY . /app
 RUN chmod +x entrypoint.sh
 
-EXPOSE 8020
+EXPOSE 8000
 
 ENTRYPOINT ["/app/entrypoint.sh"]
