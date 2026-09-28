@@ -8,6 +8,7 @@
   - [Environment Variables](#environment-variables)
   - [Running with Docker Compose](#running-with-docker-compose)
   - [Running with Docker Run](#running-with-docker-run)
+  - [Building the Image Manually](#building-the-image-manually-without-docker-compose)
   - [Customizing the Configuration](#customizing-the-configuration)  
 ## Description
  
@@ -32,42 +33,19 @@ docker build -t truck-signs-api:latest .
 
 This builds the Django application image using the `Dockerfile` in the project root. The database image (`postgres:16-alpine`) is pulled directly from Docker Hub and does not need to be built.
 
-### Running the Application
-
-Create a shared network and a named volume for the database:
+### Starting the Application
 
 ```bash
-docker network create tsa-network
-docker volume create postgres_data
+docker compose up -d
 ```
 
-Start the database container:
+This starts both the backend and the PostgreSQL database on a shared network. Once running, the API is reachable at `http://<host>:8020`.
+
+To stop the application:
 
 ```bash
-docker run -d \
-  --name tsa_db \
-  --network tsa-network \
-  --restart unless-stopped \
-  --env-file .env \
-  -v postgres_data:/var/lib/postgresql/data \
-  postgres:16-alpine
+docker compose down
 ```
-
-Start the backend container:
-
-```bash
-docker run -d \
-  --name tsa_backend \
-  --network tsa-network \
-  --restart unless-stopped \
-  --env-file .env \
-  -p 8020:8000 \
-  -v ./src/staticfiles:/app/src/staticfiles \
-  -v ./src/media:/app/src/media \
-  truck-signs-api:latest
-```
-
-Once running, the API is reachable at `http://<host>:8020`.
  
 ## Usage
  
@@ -143,6 +121,53 @@ docker run -d \
   -e DJANGO_SUPERUSER_PASSWORD=<admin-password> \
   truck-signs-api:latest
 ```
+
+### Building the Image Manually (without Docker Compose)
+
+Build the backend image locally:
+
+```bash
+docker build -t truck-signs-api:latest .
+```
+
+This builds the Django application image using the `Dockerfile` in the project root. The database image (`postgres:16-alpine`) is pulled directly from Docker Hub and does not need to be built.
+
+### Running the Application
+
+Create a shared network and a named volume for the database:
+
+```bash
+docker network create tsa-network
+docker volume create postgres_data
+```
+
+Start the database container:
+
+```bash
+docker run -d \
+  --name tsa_db \
+  --network tsa-network \
+  --restart unless-stopped \
+  --env-file .env \
+  -v postgres_data:/var/lib/postgresql/data \
+  postgres:16-alpine
+```
+
+Start the backend container:
+
+```bash
+docker run -d \
+  --name tsa_backend \
+  --network tsa-network \
+  --restart unless-stopped \
+  --env-file .env \
+  -p 8020:8000 \
+  -v ./src/staticfiles:/app/src/staticfiles \
+  -v ./src/media:/app/src/media \
+  truck-signs-api:latest
+```
+
+Once running, the API is reachable at `http://<host>:8020`.
  
 ### Customizing the Configuration
  
