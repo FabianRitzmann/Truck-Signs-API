@@ -18,31 +18,26 @@ services:
       retries: 5
 
   backend:
-    build: .
+    image: truck-signs-api-backend:latest
     container_name: tsa_backend
     command: gunicorn tsa_app.wsgi:application --bind 0.0.0.0:8000 --workers 4
     restart: unless-stopped
     env_file: .env
-    environment:
-      MODE: prod
-      DEBUG_ENABLED: 'False'
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      ALLOWED_HOSTS: ${ALLOWED_HOSTS}
     ports:
       - '8020:8000'
     networks:
       - tsa-network
     volumes:
-      - ./src/staticfiles:/app/src/staticfiles
-      - ./src/media:/app/src/media
+      - staticfiles_data:/app/src/staticfiles
+      - media_data:/app/src/media
     depends_on:
       db:
         condition: service_healthy
 
 volumes:
   postgres_data:
-
+  staticfiles_data:
+  media_data:
 networks:
   tsa-network:
     driver: bridge
